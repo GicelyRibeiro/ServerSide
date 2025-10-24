@@ -1,0 +1,72 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const mysql = require("mysql");
+
+const app = express();
+const PORT = 3000; // Server port
+const PORT = 3001;//port and is giving error i want to cry
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+
+// Middleware to read form data
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// MySQL Connection
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",//MySQL username
+  password: "123456",//MySQL password
+  database: "my_database"//database name
+});
+
+// Connect to MySQL
+db.connect((err) => {
+  if (err) {
+    console.log("❌ Database connection failed:", err);
+  } else {
+    console.log("✅ Connected to MySQL database.");
+  }
+});
+
+// Route to handle form submission
+app.post("/submit", (req, res) => {
+  const firstName = req.body.firstName;
+
+@@ -14,23 +36,18 @@ app.post("/submit", (req, res) => {
+  const email = req.body.email;
+  const phone = req.body.phone;
+  const eircode = req.body.eircode;
+
+const sql = `
+  INSERT INTO user_data (first_name, last_name, email, phone_number, eircode) VALUES (?, ?, ?, ?, ?)`;
+
+  // Here you can print or process the data
+  console.log("Form Data Received:");
+  console.log("First Name:", firstName);
+  console.log("Last Name:", lastName);
+  console.log("Email:", email);
+  console.log("Phone:", phone);
+  console.log("Eircode:", eircode);
+
+  res.send("✅ Form submitted successfully and data received!");
+  db.query(sql, [firstName, lastName, email, phone, eircode], (err, result) => {
+    if (err) {
+      console.log("❌ Failed to insert data:", err);
+      res.send("❌ Error inserting data into database.");
+    } else {
+      console.log("✅ Data inserted successfully:", result.insertId);
+      res.send("✅ Form submitted and data saved to MySQL database!");
+    }
+  });
+});
+
+// Start server
+app.listen(PORT, (err) => {
+  if (err) {
+    console.log("❌ Error starting server:", err);
+  } else {
+    console.log(`✅ Server is running on http://localhost:${PORT}`);
+  }
+});
